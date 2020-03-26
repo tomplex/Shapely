@@ -118,7 +118,7 @@ class MultiPolygonAdapter(CachingGeometryProxy, MultiPolygon):
             # From array protocol
             array = self.context[0][0].__array_interface__
             n = array['shape'][1]
-            assert n == 2 or n == 3
+            assert (n == 2 or n == 3), "Geometries with > 3 dimensions are not supported."
             return n
         except AttributeError:
             # Fall back on list
@@ -136,7 +136,7 @@ def geos_multipolygon_from_py(ob):
     assert L >= 1
     
     N = len(ob[0][0][0])
-    assert N == 2 or N == 3
+    assert (N == 2 or N == 3), "Geometries with > 3 dimensions are not supported."
 
     subs = (c_void_p * L)()
     for l in range(L):
@@ -182,7 +182,7 @@ def geos_multipolygon_from_polygons(arg):
     except TypeError:
         N = exemplar._ndim
     
-    assert N == 2 or N == 3
+    assert (N == 2 or N == 3), "Geometries with > 3 dimensions are not supported."
 
     subs = (c_void_p * L)()
 

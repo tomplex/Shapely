@@ -166,7 +166,7 @@ class PointAdapter(CachingGeometryProxy, Point):
             # From array protocol
             array = self.context.__array_interface__
             n = array['shape'][0]
-            assert n == 2 or n == 3
+            assert (n == 2 or n == 3), "Geometries with > 3 dimensions are not supported."
             return n
         except AttributeError:
             # Fall back on list

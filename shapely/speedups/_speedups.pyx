@@ -96,7 +96,7 @@ def geos_linestring_from_py(ob, update_geom=None, update_ndim=0):
         except IndexError:
             raise ValueError(
                 "Input %s is the wrong shape for a LineString" % str(ob))
-        assert n == 2 or n == 3
+        assert (n == 2 or n == 3), "Geometries with > 3 dimensions are not supported."
 
         # Make pointer to the coordinate array
         if isinstance(array['data'], ctypes.Array):
@@ -169,7 +169,7 @@ def geos_linestring_from_py(ob, update_geom=None, update_ndim=0):
         except TypeError:
             raise ValueError(
                 "Input %s is the wrong shape for a LineString" % str(ob))
-        assert n == 2 or n == 3
+        assert (n == 2 or n == 3), "Geometries with > 3 dimensions are not supported."
 
         # Create a coordinate sequence
         if update_geom is not None:
@@ -251,7 +251,7 @@ def geos_linearring_from_py(ob, update_geom=None, update_ndim=0):
         if m < 3:
             raise ValueError(
                 "A LinearRing must have at least 3 coordinate tuples")
-        assert n == 2 or n == 3
+        assert (n == 2 or n == 3), "Geometries with > 3 dimensions are not supported."
 
         # Make pointer to the coordinate array
         if isinstance(array['data'], ctypes.Array):

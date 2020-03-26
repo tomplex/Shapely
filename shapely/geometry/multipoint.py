@@ -131,7 +131,7 @@ class MultiPointAdapter(CachingGeometryProxy, MultiPoint):
             # From array protocol
             array = self.context.__array_interface__
             n = array['shape'][1]
-            assert n == 2 or n == 3
+            assert (n == 2 or n == 3), "Geometries with > 3 dimensions are not supported."
             return n
         except AttributeError:
             # Fall back on list
@@ -160,7 +160,7 @@ def geos_multipoint_from_py(ob):
         n = len(ob[0])
     except TypeError:
         n = ob[0]._ndim
-    assert n == 2 or n == 3
+    assert (n == 2 or n == 3), "Geometries with > 3 dimensions are not supported."
 
     # Array of pointers to point geometries
     subs = (c_void_p * m)()

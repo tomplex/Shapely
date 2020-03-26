@@ -96,7 +96,7 @@ class MultiLineStringAdapter(CachingGeometryProxy, MultiLineString):
             # From array protocol
             array = self.context[0].__array_interface__
             n = array['shape'][1]
-            assert n == 2 or n == 3
+            assert (n == 2 or n == 3), "Geometries with > 3 dimensions are not supported."
             return n
         except AttributeError:
             # Fall back on list
