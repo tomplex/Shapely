@@ -340,7 +340,7 @@ def geos_linearring_from_py(ob, update_geom=None, update_ndim=0):
         if m < 3:
             raise ValueError(
                 "A LinearRing must have at least 3 coordinate tuples")
-        assert (n == 2 or n == 3)
+        assert (n == 2 or n == 3), "Geometries with > 3 dimensions are not supported."
 
         # Add closing coordinates if not provided
         if (
