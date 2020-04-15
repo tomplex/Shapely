@@ -26,7 +26,7 @@ class CachingGeometryProxy(object):
 
     @property
     def _geom(self):
-        """Keeps the GEOS geometry in synch with the context."""
+        """Keeps the GEOS geometry in sync with the context."""
         gtag = self.gtag()
         if gtag != self._gtag or self._is_empty:
             self.empty()

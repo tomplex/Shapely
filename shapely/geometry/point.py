@@ -157,6 +157,8 @@ class PointAdapter(CachingGeometryProxy, Point):
     _other_owned = False
 
     def __init__(self, context):
+        if hasattr(context, '__geo_interface__'):
+            context = context.__geo_interface__['coordinates']
         self.context = context
         self.factory = geos_point_from_py
 

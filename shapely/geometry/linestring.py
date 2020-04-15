@@ -151,6 +151,8 @@ class LineString(BaseGeometry):
 class LineStringAdapter(CachingGeometryProxy, LineString):
 
     def __init__(self, context):
+        if hasattr(context, '__geo_interface__'):
+            context = context.__geo_interface__['coordinates']
         self.context = context
         self.factory = geos_linestring_from_py
 
