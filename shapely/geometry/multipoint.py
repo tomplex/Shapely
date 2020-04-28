@@ -2,6 +2,7 @@
 """
 
 import sys
+import warnings
 
 if sys.version_info[0] < 3:
     range = xrange
@@ -155,24 +156,23 @@ def geos_multipoint_from_py(ob):
     if isinstance(ob, MultiPoint):
         return geos_geom_from_py(ob)
 
-    m = len(ob)
     try:
-        n = len(ob[0])
+        dims = len(ob[0])
     except TypeError:
-        n = ob[0]._ndim
-    assert n == 2 or n == 3
+        dims = ob[0]._ndim
+    assert dims == 2 or dims == 3
 
-    # Array of pointers to point geometries
-    subs = (c_void_p * m)()
+    def iter_nonempty():
+        for pygeom in ob:
+            geos_geom, _ = point.geos_point_from_py(pygeom)
 
-    # add to coordinate sequence
-    for i in range(m):
-        coords = ob[i]
-        geom, ndims = point.geos_point_from_py(coords)
+            if lgeos.GEOSisEmpty(geos_geom):
+                warnings.warn("Skipping empty Point.")
+                continue
 
-        if lgeos.GEOSisEmpty(geom):
-            raise ValueError("Can't create MultiPoint with empty component")
+            yield cast(geos_geom, c_void_p)
 
-        subs[i] = cast(geom, c_void_p)
+    geos_geoms = tuple(iter_nonempty())
+    geom_array = (c_void_p * len(geos_geoms))(*geos_geoms)
 
-    return lgeos.GEOSGeom_createCollection(4, subs, m), n
+    return lgeos.GEOSGeom_createCollection(4, geom_array, len(geom_array)), dims

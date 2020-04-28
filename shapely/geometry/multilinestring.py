@@ -2,6 +2,7 @@
 """
 
 import sys
+import warnings
 
 if sys.version_info[0] < 3:
     range = xrange
@@ -115,30 +116,30 @@ def geos_multilinestring_from_py(ob):
     if isinstance(ob, MultiLineString):
          return geos_geom_from_py(ob)
 
-    obs = getattr(ob, 'geoms', ob)
-    L = len(obs)
-    assert L >= 1
-    exemplar = obs[0]
+    objs = getattr(ob, 'geoms', ob)
+    assert len(objs) >= 1
     try:
-        N = len(exemplar[0])
+        dims = len(objs[0][0])
     except TypeError:
-        N = exemplar._ndim
-    if N not in (2, 3):
+        dims = objs[0]._ndim
+
+    if dims not in (2, 3):
         raise ValueError("Invalid coordinate dimensionality")
 
-    # Array of pointers to point geometries
-    subs = (c_void_p * L)()
-    
-    # add to coordinate sequence
-    for l in range(L):
-        geom, ndims = linestring.geos_linestring_from_py(obs[l])
+    def iter_nonempty():
+        for pygeom in objs:
+            geos_geom, _ = linestring.geos_linestring_from_py(pygeom)
 
-        if lgeos.GEOSisEmpty(geom):
-            raise ValueError("Can't create MultiLineString with empty component")
+            if lgeos.GEOSisEmpty(geos_geom):
+                warnings.warn("Skipping empty LineString.")
+                continue
 
-        subs[l] = cast(geom, c_void_p)
-            
-    return (lgeos.GEOSGeom_createCollection(5, subs, L), N)
+            yield cast(geos_geom, c_void_p)
+
+    geos_geoms = tuple(iter_nonempty())
+    geom_array = (c_void_p * len(geos_geoms))(*geos_geoms)
+
+    return lgeos.GEOSGeom_createCollection(5, geom_array, len(geom_array)), dims
 
 
 # Test runner

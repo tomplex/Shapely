@@ -1,3 +1,5 @@
+import warnings
+
 from . import unittest, numpy, test_int_types
 from .test_multi import MultiGeometryTestCase
 from shapely.geos import lgeos
@@ -8,7 +10,6 @@ from shapely.geometry.base import dump_coords
 class MultiLineStringTestCase(MultiGeometryTestCase):
 
     def test_multilinestring(self):
-
         # From coordinate tuples
         geom = MultiLineString((((1.0, 2.0), (3.0, 4.0)),))
         self.assertIsInstance(geom, MultiLineString)
@@ -38,7 +39,6 @@ class MultiLineStringTestCase(MultiGeometryTestCase):
                          {'type': 'MultiLineString',
                           'coordinates': (((0.0, 0.0), (1.0, 2.0)),)})
 
-
     def test_from_multilinestring_z(self):
         coords1 = [(0.0, 1.0, 2.0), (3.0, 4.0, 5.0)]
         coords2 = [(6.0, 7.0, 8.0), (9.0, 10.0, 11.0)]
@@ -53,10 +53,8 @@ class MultiLineStringTestCase(MultiGeometryTestCase):
         self.assertEqual(dump_coords(copy.geoms[0]), coords1)
         self.assertEqual(dump_coords(copy.geoms[1]), coords2)
 
-
     @unittest.skipIf(not numpy, 'Numpy required')
     def test_numpy(self):
-
         from numpy import array
         from numpy.testing import assert_array_equal
 
@@ -80,13 +78,16 @@ class MultiLineStringTestCase(MultiGeometryTestCase):
         self.subgeom_access_test(MultiLineString, [line0, line1])
 
     def test_create_multi_with_empty_component(self):
-        with self.assertRaises(ValueError) as exc:
-            wkt = MultiLineString([
+        with warnings.catch_warnings(record=True) as warns:
+            mls = MultiLineString([
                 LineString([(0, 0), (1, 1), (2, 2)]),
                 LineString()
-            ]).wkt
+            ])
+            self.assertEqual(len(warns), 1)
 
-        self.assertRegex(str(exc.exception), "Can't create MultiLineString with empty component")
+        self.assertEqual(len(mls), 1)
+        self.assertEqual(mls.wkt,
+                         'MULTILINESTRING ((0.0000000000000000 0.0000000000000000, 1.0000000000000000 1.0000000000000000, 2.0000000000000000 2.0000000000000000))')
 
 
 def test_suite():
