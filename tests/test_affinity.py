@@ -4,12 +4,15 @@ from shapely import affinity
 from shapely.wkt import loads as load_wkt
 from shapely.geometry import Point
 
+from tests.conftest import almost_equals_deprecated
+
 try:
     import numpy
 except ImportError:
     numpy = False
 
 
+@almost_equals_deprecated
 class AffineTestCase(unittest.TestCase):
 
     def test_affine_params(self):
@@ -132,6 +135,7 @@ class AffineTestCase(unittest.TestCase):
                 self.assertAlmostEqual(ap, ep)
 
 
+@almost_equals_deprecated
 class TransformOpsTestCase(unittest.TestCase):
 
     def test_rotate(self):

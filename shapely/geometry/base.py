@@ -5,7 +5,7 @@ geometry objects, but has no effect on geometric analysis. All
 operations are performed in the x-y plane. Thus, geometries with
 different z values may intersect or be equal.
 """
-
+import warnings
 from binascii import a2b_hex
 from ctypes import pointer, c_size_t, c_char_p, c_void_p
 from itertools import islice
@@ -662,6 +662,26 @@ class BaseGeometry(object):
             op = self.impl['simplify']
         return geom_factory(op(self, tolerance))
 
+    def copy(self):
+        """Create a new copy of the geometry.
+        Custom attributes will not be retained."""
+        return type(self)(self)
+
+    def normalize(self):
+        """
+        Create a canonical representation of the geometry,
+        forcing a consistent ordering of coordinates, rings, or component
+        geometries.
+
+        Returns
+        -------
+        Normalized geometry.
+
+        """
+        newgeom = self.copy()
+        result = self.impl['normalize'](newgeom)
+        return newgeom
+
     # Binary operations
     # -----------------
 
@@ -776,14 +796,38 @@ class BaseGeometry(object):
         """Returns True if geometry is within the other, else False"""
         return bool(self.impl['within'](self, other))
 
-    def equals_exact(self, other, tolerance):
-        """Returns True if geometries are equal to within a specified
-        tolerance
+    def equals_exact(self, other, tolerance=0, normalize=False):
+        """
+        Returns True if geometries are equal to within a specified
+        tolerance.
 
         Refers to coordinate equality, which requires coordinates to be equal
-        and in the same order for all components of a geometry
+        and in the same order for all components of a geometry (and for all
+        components to be in the same order).
+
+        For example, two polygons with identical point-sets with different start coordinates
+        are not exactly equal.
+
+        Parameters
+        ----------
+        other Geometry:
+            geometry to check equality with
+        tolerance float:
+            amount of tolerance when comparing coordinate values. Useful when floating-point
+            roundoff errors could come into play.
+        normalize bool:
+            Should the current and input geometries be normalized to a canonical form before comparing.
+
+        Returns
+        -------
+        bool:
+            Are the geometries exactly equal
         """
-        return bool(self.impl['equals_exact'](self, other, tolerance))
+        if normalize:
+            a, b = self.normalize(), other.normalize()
+        else:
+            a, b = self, other
+        return bool(self.impl['equals_exact'](a, b, tolerance))
 
     def almost_equals(self, other, decimal=6):
         """Returns True if geometries are equal at all coordinates to a
@@ -792,6 +836,11 @@ class BaseGeometry(object):
         Refers to approximate coordinate equality, which requires coordinates be
         approximately equal and in the same order for all components of a geometry.
         """
+        warnings.warn(
+            "almost_equals is deprecated. Please use "
+            "equals_exact with a tolerance of 0.5 * 10**(-decimal) for "
+            "equivalent behvaior.",
+            FutureWarning, stacklevel=2)
         return self.equals_exact(other, 0.5 * 10**(-decimal))
 
     def relate_pattern(self, other, pattern):

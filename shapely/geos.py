@@ -772,6 +772,7 @@ class LGEOS310(LGEOSBase):
         self.methods['topology_preserve_simplify'] = \
             self.GEOSTopologyPreserveSimplify
         self.methods['cascaded_union'] = self.GEOSUnionCascaded
+        self.methods['normalize'] = self.GEOSNormalize
 
 
 class LGEOS311(LGEOS310):

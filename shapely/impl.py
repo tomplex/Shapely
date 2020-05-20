@@ -128,6 +128,8 @@ IMPL310 = {
     'prepared_contains_properly':
         (BinaryPredicate, 'prepared_contains_properly'),
     'prepared_covers': (BinaryPredicate, 'prepared_covers'),
+    'normalize': (UnaryTopologicalOp, 'normalize'),
+
     }
 
 IMPL311 = {

@@ -257,6 +257,9 @@ def prototype(lgeos, geos_version):
     lgeos.GEOSTopologyPreserveSimplify.restype = c_void_p
     lgeos.GEOSTopologyPreserveSimplify.argtypes = [c_void_p, c_double]
 
+    lgeos.GEOSNormalize.restype = c_int
+    lgeos.GEOSNormalize.argtypes = [c_void_p]
+
     # Binary predicates
     # Return 2 on exception, 1 on true, 0 on false
 

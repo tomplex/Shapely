@@ -2,8 +2,10 @@ from . import unittest
 from shapely.algorithms.polylabel import polylabel, Cell
 from shapely.geometry import LineString, Point, Polygon
 from shapely.geos import TopologicalError
+from tests.conftest import almost_equals_deprecated
 
 
+@almost_equals_deprecated
 class PolylabelTestCase(unittest.TestCase):
     def test_polylabel(self):
         """

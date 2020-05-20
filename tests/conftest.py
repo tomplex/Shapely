@@ -7,6 +7,8 @@ from shapely.geos import geos_version
 
 requires_geos_342 = pytest.mark.skipif(geos_version < (3, 4, 2), reason="GEOS > 3.4.2 is required.")
 
+almost_equals_deprecated = pytest.mark.filterwarnings("ignore:almost_equals:FutureWarning")
+
 
 def pytest_addoption(parser):
     parser.addoption("--with-speedups", action="store_true", default=False,
